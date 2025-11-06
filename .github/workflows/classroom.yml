@@ -8,6 +8,13 @@ on:
     branches:
       - master
       - develop
+      
+      
+env:
+  REGISTRY: docker.io
+  IMAGE_PREFIX: ${{ secrets.DOCKERHUB_USERNAME }}
+  
+
 jobs:
   build:
     name: Build
@@ -41,11 +48,18 @@ jobs:
       - name: Run Tests
         run: dotnet test ./src/Booking.System/
 
-      # TODO build and run unit tests
-
-      #- name: Build images
-      #  timeout-minutes: 10
-      #  run: docker compose build --push
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Build and push Docker images
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          docker compose -f docker-compose.build.yml build
+          docker compose -f docker-compose.build.yml push
 
   deploy:
     name: Deploy 
