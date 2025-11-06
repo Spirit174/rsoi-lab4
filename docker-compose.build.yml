@@ -1,0 +1,25 @@
+version: "3"
+services:
+  loyalty_service:
+    build:
+      context: src
+      dockerfile: Booking.System/Booking.System.LoyaltyService/Dockerfile
+    image: ${DOCKERHUB_USERNAME}/loyalty_service:latest
+  
+  payment_service:
+    build:
+      context: src
+      dockerfile: Booking.System/Booking.System.PaymentService/Dockerfile
+    image: ${DOCKERHUB_USERNAME}/payment_service:latest
+  
+  reservation_service:
+    build:
+      context: src
+      dockerfile: Booking.System/Booking.System.ReservationService/Dockerfile
+    image: ${DOCKERHUB_USERNAME}/reservation_service:latest
+
+  gateway_service:
+    build:
+      context: src
+      dockerfile: Booking.System/Booking.System.Gateway/Dockerfile
+    image: ${DOCKERHUB_USERNAME}/gateway-service:latest
