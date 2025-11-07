@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: Always
           name: {{ .Chart.Name }}-service
           ports:
-            - name: "{{ .Chart.Name }}-port"
+            - name: "{{ .Chart.Name }}-p"
               containerPort: {{ .Values.service.port }}
               protocol: TCP
       restartPolicy: Always
