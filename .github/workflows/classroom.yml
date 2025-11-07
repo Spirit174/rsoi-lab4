@@ -88,11 +88,34 @@ jobs:
           cd k8s
           helm install -n spirit postgres ./postgres
           helm install -n spirit services ./services
+          
+      - name: Enable Ingress in Minikube
+        run: |
+          minikube addons enable ingress
+          
+          kubectl wait --namespace ingress-nginx \
+            --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=300s
+            
+      - name: Wait for Ingress
+        run: |
+          # Ждем готовности admission webhook
+          until kubectl get svc -n ingress-nginx ingress-nginx-controller-admission 2>/dev/null; do
+            echo "Waiting for admission service..."
+            sleep 5
+          done
+          
+      - name: Deploy Ingress
+        run: |
+          kubectl apply -f k8s/ingress.yaml
       
       - name: Check 
         if: always()
         run: |          
           kubectl get pods -n spirit -o wide
+      
+      
       
       #- name: Wait before services are ready
         #run: kubectl wait -n test -l app.kubernetes.io/name=gateway pod --for=condition=Ready --timeout 3m
