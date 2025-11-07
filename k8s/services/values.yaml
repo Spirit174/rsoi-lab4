@@ -1,0 +1,51 @@
+loyalty:
+  service:
+    type: ClusterIP
+    port: 8050
+    image: spirit2174/loyalty-service:latest
+    env:
+      DATA_BASE_PORT: 5432
+      DATA_BASE_NAME: loyalties
+      DATA_BASE_USER: program
+      DATA_BASE_PASS: test
+      DATA_BASE_HOST: postgres
+
+payment:
+  service:
+    type: ClusterIP
+    port: 8060
+    image: spirit2174/payment_service:latest
+    env:
+      DATA_BASE_PORT: 5432
+      DATA_BASE_NAME: payments
+      DATA_BASE_USER: program
+      DATA_BASE_PASS: test
+      DATA_BASE_HOST: postgres
+      
+      
+reservation:
+  service:
+    type: ClusterIP
+    port: 8070
+    image: spirit2174/reservation_service:latest
+    env:
+      DATA_BASE_PORT: 5432
+      DATA_BASE_NAME: reservations
+      DATA_BASE_USER: program
+      DATA_BASE_PASS: test
+      DATA_BASE_HOST: postgres
+
+gateway:
+  service:
+    type: NodePort
+    port: 8080
+    nodePort: 30000
+    image: spirit2174/gateway-service:latest
+    isGateway: true
+    env:
+      LOYALTY_SERVICE_HOST: loyalty.spirit2174.svc.cluster.local
+      LOYALTY_SERVICE_PORT: 8050
+      PAYMENT_SERVICE_HOST: payment.spirit2174.svc.cluster.local
+      PAYMENT_SERVICE_PORT: 8060
+      RESERVATION_SERVICE_HOST: reservation.spirit2174.svc.cluster.local
+      RESERVATION_SERVICE_PORT: 8070

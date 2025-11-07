@@ -79,6 +79,15 @@ jobs:
           
       - name: Create Namespace
         run: kubectl create namespace spirit 
+        
+        
+      - name: Deploy DB and services
+        run: |
+          kubectl get namespace
+          
+          cd k8s
+          helm install -n spirit postgres ./postgres
+          helm install -n spirit services ./services
       
       - name: Check 
         if: always()
