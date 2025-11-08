@@ -22,4 +22,4 @@ services:
     build:
       context: src
       dockerfile: Booking.System/Booking.System.Gateway/Dockerfile
-    image: ${DOCKERHUB_USERNAME}/gateway-service:latest
+    image: ${DOCKERHUB_USERNAME}/gateway_service:latest
