@@ -102,7 +102,7 @@ jobs:
             --selector=app.kubernetes.io/component=controller \
             --timeout=300s
             
-      - name: Wait 30s
+      - name: Wait 15s
         uses: jakejarvis/wait-action@master
         with:
           time: '15s'
@@ -110,6 +110,37 @@ jobs:
       - name: Deploy Ingress
         run: |
           kubectl apply -f k8s/ingress.yaml
+          
+          
+          minikube tunnel &
+          TUNNEL_PID=$!
+          echo "TUNNEL_PID=$TUNNEL_PID" >> $GITHUB_ENV
+          
+          sleep 30
+          
+          kubectl get ingress -n spirit -o wide
+          
+      
+      - name: Initialize Databases
+        run: |
+          kubectl expose deployment postgres -n spirit \
+            --port=5432 \
+            --target-port=5432 \
+            --name=postgres
+          
+          sleep 5
+
+          kubectl get svc -n spirit postgres -o wide
+          kubectl wait --namespace spirit --for=condition=ready pod -l app=postgres --timeout=300s
+          
+          echo "Initialize databases and schemas..."
+          for script in 00-init-user.sql 01-create-databases.sql 02-reservations-schema.sql 03-payments-schema.sql 04-loyalties-schema.sql; do
+            echo "Executing $script..."
+            kubectl exec -n spirit deployment/postgres -- \
+              psql -U postgres -f /docker-entrypoint-initdb.d/$script
+          done
+    
+          echo "Database initialization completed"
       
       - name: Check 
         if: always()
@@ -119,10 +150,19 @@ jobs:
           kubectl get services -n spirit -o wide
       
       
-      #- name: Wait before services are ready
-        #run: kubectl wait -n test -l app.kubernetes.io/name=gateway pod --for=condition=Ready --timeout 3m
+      - name: Run Test Script
+        run: |
+          echo "=== Running test script ==="
+          chmod +x ./scripts/test-script.sh
+          ./scripts/test-script.sh v2 loyalty spirit
+
       
-      # TODO setup parameters in classroom/autograding.json
+      - name: Cleanup Tunnel
+        if: always()
+        run: |
+          if [ ! -z "$TUNNEL_PID" ]; then
+            kill $TUNNEL_PID 2>/dev/null || true
+          fi
       
       - name: Autograding
         uses: education/autograding@v1
