@@ -86,6 +86,10 @@ jobs:
           kubectl get namespace
           
           cd k8s
+          
+          helm delete postgres --namespace spirit --ignore-not-found
+          helm delete services --namespace spirit --ignore-not-found
+          
           helm install -n spirit postgres ./postgres
           helm install -n spirit services ./services
           
@@ -98,13 +102,10 @@ jobs:
             --selector=app.kubernetes.io/component=controller \
             --timeout=300s
             
-      - name: Wait for Ingress
-        run: |
-          # Ждем готовности admission webhook
-          until kubectl get svc -n ingress-nginx ingress-nginx-controller-admission 2>/dev/null; do
-            echo "Waiting for admission service..."
-            sleep 5
-          done
+      - name: Wait 30s
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '15s'
           
       - name: Deploy Ingress
         run: |
@@ -114,7 +115,8 @@ jobs:
         if: always()
         run: |          
           kubectl get pods -n spirit -o wide
-      
+          kubectl get all -n spirit -o wide
+          kubectl get services -n spirit -o wide
       
       
       #- name: Wait before services are ready

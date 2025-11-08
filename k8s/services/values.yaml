@@ -2,7 +2,7 @@ loyalty:
   service:
     type: ClusterIP
     port: 8050
-    image: spirit2174/loyalty-service:latest
+    image: spirit2174/loyalty_service:latest
     env:
       DATA_BASE_PORT: 5432
       DATA_BASE_NAME: loyalties
@@ -40,7 +40,7 @@ gateway:
     type: NodePort
     port: 8080
     nodePort: 30000
-    image: spirit2174/gateway-service:latest
+    image: spirit2174/gateway_service:latest
     isGateway: true
     env:
       LOYALTY_SERVICE_HOST: loyalty.spirit2174.svc.cluster.local
