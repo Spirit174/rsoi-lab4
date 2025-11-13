@@ -148,6 +148,11 @@ jobs:
           kubectl get pods -n spirit -o wide
           kubectl get all -n spirit -o wide
           kubectl get services -n spirit -o wide
+          
+          kubectl logs loyalty
+          kubectl logs payment
+          kubectl logs reservation
+          kubectl logs gateway
       
       
       - name: Run Test Script
