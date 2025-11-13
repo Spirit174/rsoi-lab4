@@ -149,10 +149,10 @@ jobs:
           kubectl get all -n spirit -o wide
           kubectl get services -n spirit -o wide
           
-          kubectl logs loyalty -n spirit
-          kubectl logs payment -n spirit
-          kubectl logs reservation -n spirit
-          kubectl logs gateway -n spirit
+          kubectl logs -f deployment.apps/loyalty -n spirit
+          kubectl logs -f deployment.apps/payment -n spirit
+          kubectl logs -f deployment.apps/reservation -n spirit
+          kubectl logs -f deployment.apps/gateway -n spirit
       
       
       - name: Run Test Script
