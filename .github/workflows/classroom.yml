@@ -9,11 +9,6 @@ on:
       - master
       - develop
       
-      
-env:
-  REGISTRY: docker.io
-  IMAGE_PREFIX: ${{ secrets.DOCKERHUB_USERNAME }}
-  
 
 jobs:
   build:
@@ -118,6 +113,10 @@ jobs:
           
           sleep 30
           
+          MINIKUBE_IP=$(minikube ip)
+          echo "MINIKUBE_IP=$MINIKUBE_IP" >> $GITHUB_ENV
+          echo "Minikube IP: $MINIKUBE_IP"
+          
           kubectl get ingress -n spirit -o wide
           
       
@@ -160,7 +159,19 @@ jobs:
           echo "=== Running test script ==="
           chmod +x ./scripts/test-script.sh
           ./scripts/test-script.sh v2 loyalty spirit
-
+          
+          
+      - name: Check
+        if: always()
+        run: |          
+          kubectl get pods -n spirit -o wide
+          kubectl get all -n spirit -o wide
+          kubectl get services -n spirit -o wide
+                    
+          kubectl logs deployment.apps/loyalty -n spirit --since=5m
+          kubectl logs deployment.apps/payment -n spirit --since=5m
+          kubectl logs deployment.apps/reservation -n spirit --since=5m
+          kubectl logs deployment.apps/gateway -n spirit --since=5m
       
       - name: Cleanup Tunnel
         if: always()
