@@ -149,10 +149,20 @@ jobs:
           kubectl get all -n spirit -o wide
           kubectl get services -n spirit -o wide
           
-          kubectl logs -f deployment.apps/loyalty -n spirit
-          kubectl logs -f deployment.apps/payment -n spirit
-          kubectl logs -f deployment.apps/reservation -n spirit
-          kubectl logs -f deployment.apps/gateway -n spirit
+          timeout 30s kubectl logs -f deployment.apps/loyalty -n spirit
+          timeout 30s kubectl logs -f deployment.apps/payment -n spirit
+          timeout 30s kubectl logs -f deployment.apps/reservation -n spirit
+          timeout 30s kubectl logs -f deployment.apps/gateway -n spirit
+          
+          kubectl logs deployment.apps/loyalty -n spirit
+          kubectl logs deployment.apps/payment -n spirit
+          kubectl logs deployment.apps/reservation -n spirit
+          kubectl logs deployment.apps/gateway -n spirit
+          
+          kubectl logs deployment.apps/loyalty -n spirit --since=5m
+          kubectl logs deployment.apps/payment -n spirit --since=5m
+          kubectl logs deployment.apps/reservation -n spirit --since=5m
+          kubectl logs deployment.apps/gateway -n spirit --since=5m
       
       
       - name: Run Test Script
